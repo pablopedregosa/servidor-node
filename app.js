@@ -12,6 +12,8 @@ var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+//quitar cabecera de respuesta x powered by
+app.set('x-powered-by', false);
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -35,6 +37,19 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
+
+    //comprobar si es un error de validacion
+    if (err.array) {
+        //const errorInfo = err.array({ onlyFirstError: true })[0];
+        err.message = 'Se han producido los siguientes errores:\n';
+        err.errors.forEach(errorInfo => {
+            err.message += `- Error en ${errorInfo.location}, parametro ${errorInfo.param} ${errorInfo.msg}\n`
+
+        });
+        err.status = 422
+    }
+
+
     // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
