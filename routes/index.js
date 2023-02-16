@@ -1,10 +1,21 @@
 var express = require('express');
 var router = express.Router();
 const { query, validationResult } = require('express-validator');
+const Agente = require('../models/Agente');
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-    res.render('index', { title: 'Express' });
+router.get('/', async function(req, res, next) {
+    try {
+
+        const agentes = await Agente.find();
+        res.locals.agentes = agentes;
+        res.locals.title = 'Express';
+        console.log(agentes);
+
+        res.render('index');
+    } catch (err) {
+        next(err);
+    }
 });
 
 router.get('/pablo', (req, res, next) => {
@@ -35,6 +46,6 @@ router.post('/enelbody', (req, res, next) => {
     const altura = req.body.altura;
     const peso = req.body.peso;
     res.send(`Recibida con altura ${altura} y peso ${peso}`)
-})
+});
 
 module.exports = router;
